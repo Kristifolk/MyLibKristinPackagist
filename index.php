@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-//use MyLib\ExchangedAmount;
 use MyLib\ExchangedAmount;
 
 $amount = new ExchangedAmount("USD", "UAH", 100);
