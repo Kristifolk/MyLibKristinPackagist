@@ -31,7 +31,7 @@ class ExchangedAmount
         foreach ($this->xml as $element) {
             $charCode = $element->CharCode;
             if ($currencyLetterCode == $charCode) {
-                $value = str_replace(',', '.', $element->Value); // Заменяем запятую на точку
+                $value = floatval(str_replace(',', '.', $element->Value)); // Заменяем запятую на точку
                 return $value;
             }
         }
@@ -43,7 +43,7 @@ class ExchangedAmount
         foreach ($this->xml as $element) {
             $charCode = $element->CharCode;
             if ($currencyLetterCode == $charCode) {
-                $nominal = $element->Nominal;
+                $nominal = floatval($element->Nominal);
                 return $nominal;
             }
         }
@@ -53,10 +53,10 @@ class ExchangedAmount
     public function toDecimal(): float
     {
         $this->xml = $this->dataAPI();
-        $valueFrom = floatval($this->value($this->from));
-        $nominalFrom = floatval($this->nominal($this->from));
-        $valueTo = floatval($this->value($this->to));
-        $nominalTo = floatval($this->nominal($this->to));
+        $valueFrom = $this->value($this->from);
+        $nominalFrom = $this->nominal($this->from);
+        $valueTo = $this->value($this->to);
+        $nominalTo = $this->nominal($this->to);
         $amountTo = round($this->amount * (($valueFrom / $nominalFrom) / ($valueTo / $nominalTo)), 2);
         //print_r($amountTo);
         return $amountTo;
