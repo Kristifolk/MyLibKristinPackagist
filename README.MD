@@ -11,11 +11,12 @@
 $from, $to - это название валюты из списка USD, EUR, RUR
 $amount - сумма которую собираются обменять.
 Библиотека должна быть опубликована на packagist. Каждый в своем проекте может подключить библиотеку при помощи composer
-composer require vendor/privatcoollib
+composer require kristin/my-lib-kristin:@dev
+
 И использовать в своем коде
 
-use PrivatCoolLib\ExchangedAmount;
+_use MyLib\ExchangedAmount;_
 
 $amount = new ExchangedAmount("USD", "UAH", 100);
-// Вернет около 2727,12
+// Вернет на текущую дату. На 25.01.2024 вернет 3745.44
 var_dump($amount->toDecimal())

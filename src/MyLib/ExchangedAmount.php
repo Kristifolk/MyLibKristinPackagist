@@ -14,10 +14,9 @@ class ExchangedAmount
         $this->from = $from;
         $this->to = $to;
         $this->amount = $amount;
-        $this->xml = $this->dataAPI();
     }
 
-    private function dataAPI()
+    private function dataAPI(): \SimpleXMLElement
     {
         $date = date('d/m/Y'); // Текущая дата
         $url = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req=' . $date;//котировки на текущий день ЦБР
@@ -27,11 +26,11 @@ class ExchangedAmount
         return $xml;
     }
 
-    private function value($valuta)
+    private function value($currencyLetterCode): float
     {
         foreach ($this->xml as $element) {
             $charCode = $element->CharCode;
-            if ($valuta == $charCode) {
+            if ($currencyLetterCode == $charCode) {
                 $value = str_replace(',', '.', $element->Value); // Заменяем запятую на точку
                 return $value;
             }
@@ -39,11 +38,11 @@ class ExchangedAmount
         return 0;
     }
 
-    private function nominal($valuta)
+    private function nominal($currencyLetterCode): float
     {
         foreach ($this->xml as $element) {
             $charCode = $element->CharCode;
-            if ($valuta == $charCode) {
+            if ($currencyLetterCode == $charCode) {
                 $nominal = $element->Nominal;
                 return $nominal;
             }
@@ -51,8 +50,9 @@ class ExchangedAmount
         return 0;
     }
 
-    function toDecimal(): float
+    public function toDecimal(): float
     {
+        $this->xml = $this->dataAPI();
         $valueFrom = floatval($this->value($this->from));
         $nominalFrom = floatval($this->nominal($this->from));
         $valueTo = floatval($this->value($this->to));
@@ -65,3 +65,4 @@ class ExchangedAmount
 
 
 //получить числовое значение из объекта SimpleXMLElement, вы можете использовать функцию floatval()
+//private function dataAPI(): \SimpleXMLElement тип данных указали \SimpleXMLElement вместо SimpleXMLElement, чтобы указать полное пространство имен для класса SimpleXMLElement
