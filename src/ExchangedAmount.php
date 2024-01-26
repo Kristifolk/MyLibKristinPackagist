@@ -4,6 +4,7 @@ namespace MyLib;
 
 class ExchangedAmount
 {
+    private \SimpleXMLElement $xml;
     /*
      конструктор до версии php 8.0
     private string $from;
@@ -28,17 +29,22 @@ class ExchangedAmount
 
     private function dataAPI(): \SimpleXMLElement
     {
-        $date = date('d/m/Y'); // Текущая дата
-        $url = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req=' . $date;  // котировки на текущий день ЦБР
-
-        $xml = simpleXML_load_file($url, "SimpleXMLElement", LIBXML_NOCDATA);
-
-        if (!$xml) {
-            var_dump("Ошибка подключения!");
-            die();
+        if (empty($this->xml)) {
+            $date = date('d/m/Y'); // Текущая дата
+            $url = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req=' . $date;  // котировки на текущий день ЦБР
+            libxml_use_internal_errors(true); // Включаем перехват ошибок парсинга XML
+            $xml = simpleXML_load_file($url, "SimpleXMLElement", LIBXML_NOCDATA);
+            if (!$xml) {
+                $errors = libxml_get_errors(); // Получение массива произошедших ошибок парсинга XML
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->message;
+                }
+                throw new \Exception("Can\'t connect: \n" . implode("\n", $errorMessages)); // Генерируем исключение с ошибками
+            }
+            $this->xml = $xml;
         }
-
-        return $xml;
+        return $this->xml;
 
         //simplexml_load_file — Интерпретирует XML-файл в объект. принимает три параметра: URL-адрес файла, тип объекта,
         // который будет создан из XML-данных (в данном случае SimpleXMLElement), и флаг LIBXML_NOCDATA,
